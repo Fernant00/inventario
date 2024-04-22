@@ -22,6 +22,7 @@ function Home ({navigation}:HomeProps): React.JSX.Element {
     const productItem = ({item}: {item: Product}) => (
         <TouchableOpacity style={styles.productItem}>
             <Text style={styles.itemTitle}>{item.nombre}</Text>
+            <Text style={styles.itemDetail}>Precio: ${item.precio.toFixed(2)} </Text>
         </TouchableOpacity>
     );
 
@@ -45,9 +46,16 @@ function Home ({navigation}:HomeProps): React.JSX.Element {
 const styles = StyleSheet.create({
     productItem:{
         padding:12,
+        borderBottomColor:'#c0c0c0',
+        borderBottomWidth:1,
+        backgroundColor:'withe',
     },
     itemTitle:{
-        fontSize:20,
+        fontSize:24,
+        fontWeight:'bold',
+        color:'black',
+        textTransform:'uppercase',
+
     },
     itemDetail:{
         fontSize:14,
