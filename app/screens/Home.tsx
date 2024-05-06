@@ -32,10 +32,8 @@ function Home ({navigation}:HomeProps): React.JSX.Element {
     );
 
     useEffect(() => {
-        setProducts([
-            {id: 1, nombre: 'Martillo', precio: 80, minStock: 5,currentStock:0, maxStock: 20},
-            {id: 2, nombre: 'Manguera (metro)', precio: 15, minStock: 50,currentStock:100, maxStock: 1000},
-        ]);
+        navigation.
+        setProducts();
     }, []);
 
     return (

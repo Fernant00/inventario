@@ -1,6 +1,15 @@
 import SQLite from 'react-native-sqlite-storage';
 export default class LocalDB {
-    connect(){
+   static async connect(){
         return SQLite.openDatabase({name: 'inventario'});
+    }
+    static async init(){
+        const db = await LocalDB.connect();
+        db.transaction(tx => {
+            tx.executeSql(
+                'CREATE TABLE IF NOT EXIST productos ( id INTEGER PRIMARY KEY AUTOINCREMENT,nombre VARCHAR(64) NOT NULL, precio DECIMAL(10,2) NOT NULL DEFAULT 0.0, minStock INTEGER MOT NULL DEFAULT 0, currentStock INTEGER NOT NULL DEFAULT 0, maxStock INTEGER NOT NULL DEFAULT 0,);', []
+            );
+        });
+
     }
 }
