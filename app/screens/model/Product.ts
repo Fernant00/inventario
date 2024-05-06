@@ -3,6 +3,7 @@ export interface Product {
     nombre: string;
     precio: number;
     minStock: number;
+    currentStock: number;
     maxStock: number;
 };
 /* 
