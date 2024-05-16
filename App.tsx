@@ -1,53 +1,75 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationProp, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import Home from './app/screens/Home';
 import Login from './app/screens/Login';
-import ProducDetails, {
-  Params as ProducDetailsParams,
-} from './app/screens/ProducDetails';
-const Stack = createStackNavigator();
-/* creamos el archivo app/screens/Home.tsx */
+import ProductDetails, { Params as ProductDetailsParams, } from './app/screens/ProductDetails';
+import ProductAdd from './app/screens/ProductAdd';
+import { Button } from 'react-native';
+import { MovientosScreenParams } from './app/screens/MovimientosScreen';
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+export type StackNavigation = NavigationProp<RootStackParamList>;
 
 export type RootStackParamList = {
+  Login:undefined;
   Home: undefined;
-  ProducDetails: ProducDetailsParams;
+  ProductDetails: ProductDetailsParams;
+  ProductAdd: undefined;
+  EntradasScreen: MovientosScreenParams;
 };
+/* creamos el archivo app/screens/Home.tsx */
+function HomeHeader ():React.JSX.Element{
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  return (<Button title='Agregar' onPress={()=> navigation.navigate('ProductAdd')}/>
+);
+}
 
 function App(): React.JSX.Element {
-  return  (
+  return (
 
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName='Login'>
-          <Stack.Screen 
-          name='Login' 
-          component={Login} 
-          options = {{
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Login'>
+        <Stack.Screen
+          name='Login'
+          component={Login}
+          options={{
             headerShown: false,
             headerStyle: { backgroundColor: '#0ff040' },
           }}
-          />
-          <Stack.Screen 
-          name='Home' 
+        />
+        <Stack.Screen
+          name='Home'
           component={Home}
-          options = {{
+          options={{
             headerShown: true,
             headerStyle: { backgroundColor: 'blue' },
-          }} 
-          /><Stack.Screen 
-          name='ProducDetails' 
-          component={ProducDetails}
-          options = {{
+            headerRight: HomeHeader,
+          }}
+        />
+
+        <Stack.Screen
+          name='ProductDetails'
+          component={ProductDetails}
+          options={{
             headerShown: true,
-            headerStyle: { backgroundColor: 'blue' },
-          }} 
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-  
-);
-  
+            headerStyle: { backgroundColor: 'green' },
+          }}
+        />
+
+        <Stack.Screen
+        name='ProductAdd'
+        component={ProductAdd}
+        />
+
+      </Stack.Navigator>
+
+    </NavigationContainer>
+
+  );
+
 }
 
 export default App;

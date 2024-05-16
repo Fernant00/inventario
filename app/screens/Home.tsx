@@ -6,6 +6,8 @@ import { Product } from './model/Product';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import {RootStackParamList} from '../../App';
 
+import LocalDB from '../screens/persistance/localdb';
+
 type HomeScreenProps = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRoute = RouteProp<RootStackParamList, 'Home'>;
 
@@ -15,8 +17,9 @@ type HomeProps = {
 };
 function Home ({navigation}:HomeProps): React.JSX.Element {
     const [products, setProducts] = useState<Product[]>([]);
-    const productItem = ({item}: {item: Product}) => (
-        <TouchableOpacity style={styles.productItem} onPress={()=> navigation.push("ProducDetails",{product: item})}>
+    const productItem = ({ item }: { item: Product }) => (
+        <TouchableOpacity style={styles.productItem}
+            onPress={() => navigation.push("ProductDetails", {product: item})}>
 
             <View style={{flexDirection:'row'}}>
                 <View style={{flexDirection:'column' , flexGrow:9}}>
@@ -32,17 +35,27 @@ function Home ({navigation}:HomeProps): React.JSX.Element {
     );
 
     useEffect(() => {
-        navigation.
-        setProducts();
-    }, []);
+        LocalDB.init();
+        navigation.addListener('focus',async ()=>{
+        const db = await LocalDB.connect();
+        db.transaction(async tx => {
+            tx.executeSql('SELECT * FROM productos',[],(_,res)=>{
+                let prods = [];
+
+                for (let i=0; i< res.rows.length; i++){
+                    prods.push(res.rows.item(i));
+                }
+                setProducts(prods);
+            },
+            error => console.error({error}),
+        );
+    });
+});
+    },[navigation]);
 
     return (
         <SafeAreaView>
-            <FlatList
-                data={products}
-                renderItem={productItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
+            <FlatList data={products} renderItem={productItem} keyExtractor={(item) => item.id.toString()} />
         </SafeAreaView>
     );
 }
