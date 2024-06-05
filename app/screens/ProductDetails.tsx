@@ -80,7 +80,7 @@ const style = StyleSheet.create({
     color: 'red',
   },
   text: {
-    fontSize: 24,
+    fontSize: 24
   },
 });
 

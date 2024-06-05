@@ -1,4 +1,4 @@
-const host = '10.180.11.136';
+const host = '192.168.1.19';
 const port = 3000;
 
 export default {host,port}
