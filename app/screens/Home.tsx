@@ -7,6 +7,7 @@ import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import {RootStackParamList} from '../../App';
 
 import LocalDB from '../screens/persistance/localdb';
+import WebServiceParams from './WebServiceParams';
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRoute = RouteProp<RootStackParamList, 'Home'>;
@@ -37,22 +38,29 @@ function Home ({navigation}:HomeProps): React.JSX.Element {
     useEffect(() => {
         LocalDB.init();
         navigation.addListener('focus',async ()=>{
-        const db = await LocalDB.connect();
+            try{
+                const response = await fetch(
+                    'http://$(WebServiceParams.host):$(WebServiceParams.port)/productos',
+                    {
+                        method: 'GET',
+                        headers:{
+                            'Accept': 'application/json',
+                            'Content-Type':'text/plain',
+                        },
+                    },
+                );
+                setProducts(await response.json());
+            } catch(error){
+                console.log(error);
+            }
+        /*const db = await LocalDB.connect();
         db.transaction(async tx => {
-            tx.executeSql('SELECT * FROM productos',[],(_,res)=>{
-                let prods = [];
-
-                for (let i=0; i< res.rows.length; i++){
-                    prods.push(res.rows.item(i));
-                }
-                setProducts(prods);
-            },
+            tx.executeSql('SELECT * FROM productos',[],(_,res)=>setProducts(res.rows.raw()),
             error => console.error({error}),
         );
-    });
+    });*/
 });
     },[navigation]);
-
     return (
         <SafeAreaView>
             <FlatList data={products} renderItem={productItem} keyExtractor={(item) => item.id.toString()} />

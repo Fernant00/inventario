@@ -1,105 +1,87 @@
-import React, { useEffect, useState } from "react";
-import { Button, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
-import { Product } from "./model/Product";
-import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native";
+import React, {useEffect, useState} from 'react';
+import {Button, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../../App';
-import { StackNavigationProp } from "@react-navigation/stack";
+import {StackNavigationProp} from '@react-navigation/stack';
+import {Product} from './model/Product';
 
-import LocalDB from "./persistance/localdb";
 export type Params = {
-    product:Product;
-}
-
-export type Props= {
-    route: RouteProp<RootStackParamList, 'ProductDetails'>;
-    navigation:StackNavigationProp<RootStackParamList, 'ProductDetails'>;
+  product: Product;
 };
 
-function ProductDetails({route}: Props): React.JSX.Element {
-    
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    const [product,setProduct] = useState<Product>();
-    const [minStock, setminStock] = useState<String>('0');
-    const [maxStock, setmaxStock] = useState<String>('0');
-    const [currentStock, setStock] = useState('0');
-    const [masStock, setmasStock] = useState('0');
-    
-    const btnGuardarOnPress = async()=>{
-        const db = await LocalDB.connect();
-        db.transaction(tx =>{
-            tx.executeSql(
-                'INSERT INTO productos (currentStock) VALUES (?)',
-                [currentStock ],
-                
-            );
-            console.log(currentStock);
-            navigation.goBack();
-        });
-    };
+export type Props = {
+  route: RouteProp<RootStackParamList, 'ProductDetails'>;
+  navigation: StackNavigationProp<RootStackParamList, 'ProductDetails'>;
+};
 
-    useEffect(() => {
-        
-        setProduct(route.params.product);
-    }, [route]);
-
-    return(
-        <SafeAreaView>
-            {product && (
-                <View style={styles.main}>
-                    <Text style={styles.title}>Producto</Text>
-                    <Text style={styles.itemMain}>{product.nombre}</Text>
-                    <Text style={styles.itemBadge}>Cantidad</Text>
-                    <Text style={styles.itemBadge}>{product.currentStock} / {product.maxStock}</Text>
-                    <Text style={styles.itemBadge}>Precio</Text>
-                    <Text style={styles.itemBadge}>{product.precio}</Text>
-                </View>
-            )}
-                <TextInput placeholder='stock' onChangeText={s => setStock(s)}/>
-                
-            
-                <Button title='Guardar'  onPress={btnGuardarOnPress}/>
-        </SafeAreaView>
-    );
+function ProductDetails({route, navigation}: Props): React.JSX.Element {
+  const [product, setProduct] = useState<Product>(undefined!);
+  useEffect(() => {
+    setProduct(route.params.product);
+  }, [route]);
+  return (
+    <SafeAreaView style={style.page}>
+      {product && (
+        <View>
+          <Text style={style.header}>{product.nombre}</Text>
+          <View style={style.row}>
+            <Text style={[style.text, style.col]}>Existencias:</Text>
+            <Text style={[style.text, style.colAuto]}>
+              <Text
+                style={
+                  product.currentStock < product.minStock
+                    ? style.stockError
+                    : null
+                }>
+                {product.currentStock}
+              </Text>{' '}
+              / {product.maxStock}
+            </Text>
+          </View>
+          <View style={style.row}>
+            <Text style={[style.text, style.col]}>Precio:</Text>
+            <Text style={[style.text, style.colAuto]}>
+              $ {product.precio.toFixed(2)}
+            </Text>
+          </View>
+        </View>
+      )}
+      <View style={style.row}>
+        <Button
+          title="Entrada"
+          onPress={() => navigation.push('EntradasScreen', {product})}
+        />
+        <Button
+          title="Salida"
+          onPress={() => navigation.push('SalidasScreen', {product})}
+        />
+      </View>
+    </SafeAreaView>
+  );
 }
-const styles = StyleSheet.create({
-    main:
-    {
-     display:'flex',
-    },
-    title:
-    {
-        alignSelf:'center',
-        color:'black',
-        fontSize:36,
-        fontWeight:'bold',
-        marginBottom:24,
-    },
-    itemMain: {
-        fontSize: 28,
-        color:'black',
 
-    },
-    productdetail:{
-        fontSize:24,
-        color:'black',
-        textAlign: 'center',
-        
-        fontWeight:'bold',
-    },
-    productprecio:{
-        fontSize:24,
-        color:'red',
-        textAlign: 'center',
-    },
-    itemBadge:{
-        fontSize:24,
-        color:'blue',
-        fontWeight:'bold',
-        alignSelf:'center',
-    },
-    itemBadgeError:{
-        color:'red',
-        
-    },
+const style = StyleSheet.create({
+  page: {
+    margin: 16,
+  },
+  header: {
+    fontSize: 48,
+    color: 'black',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  col: {
+    flexGrow: 999,
+  },
+  colAuto: {},
+  stockError: {
+    color: 'red',
+  },
+  text: {
+    fontSize: 24,
+  },
 });
+
 export default ProductDetails;
